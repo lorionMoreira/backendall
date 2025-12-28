@@ -20,4 +20,4 @@ services:
 networks:
   master_proxy_default:
     external: true
-    name: master_proxy_default  # ð exactly as shown in your screenshot
+    name: master_proxy_default
