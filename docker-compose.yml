@@ -4,8 +4,8 @@ services:
   app:
     build: .
     container_name: demo-app-${ENV:-dev}
-    ports:
-      - "${APP_PORT:-8080}:8080"
+    extra_hosts:
+      - "hostmachine:${HOST_MACHINE_IP}"
     environment:
       - SPRING_PROFILES_ACTIVE=${ENV:-dev}
       - DB_URL=${DB_URL}
