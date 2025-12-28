@@ -17,7 +17,7 @@ docker-compose --env-file .env.dev down
 ### Production Environment
 ```bash
 # Start with prod environment
-docker-compose --env-file .env.prod up -d --build
+docker compose --env-file .env.prod up -d --build
 
 # View logs
 docker-compose logs -f app
