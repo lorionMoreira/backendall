@@ -73,4 +73,32 @@ public class JwtUtil {
         final String username = extractUsername(token);
         return (username.equals(userDetails.getUsername()) && !isTokenExpired(token));
     }
+
+    public String extractUsernameFromExpiredToken(String token) {
+        try {
+            return extractUsername(token);
+        } catch (Exception e) {
+            // Token pode estar expirado, tentar extrair sem validar expiração
+            Claims claims = Jwts.parser()
+                    .verifyWith(getSigningKey())
+                    .build()
+                    .parseSignedClaims(token)
+                    .getPayload();
+            return claims.getSubject();
+        }
+    }
+
+    public Date extractExpirationFromExpiredToken(String token) {
+        try {
+            return extractExpiration(token);
+        } catch (Exception e) {
+            // Token pode estar expirado, tentar extrair sem validar expiração
+            Claims claims = Jwts.parser()
+                    .verifyWith(getSigningKey())
+                    .build()
+                    .parseSignedClaims(token)
+                    .getPayload();
+            return claims.getExpiration();
+        }
+    }
 }

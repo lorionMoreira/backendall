@@ -2,6 +2,7 @@ package com.example.demo.controller;
 
 import com.example.demo.dto.AuthRequest;
 import com.example.demo.dto.AuthResponse;
+import com.example.demo.dto.RefreshTokenRequest;
 import com.example.demo.dto.RegisterRequest;
 import com.example.demo.model.User;
 import com.example.demo.repository.UserRepository;
@@ -17,6 +18,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDateTime;
+import java.util.Date;
 import java.util.Optional;
 
 @RestController
@@ -106,11 +108,11 @@ public class AuthController {
         user.setPassword(passwordEncoder.encode(registerRequest.getPassword()));
         user.setEmail(registerRequest.getEmail());
         user.setRole("USER");
-
+        
         userRepository.save(user);
 
         String token = jwtUtil.generateToken(user.getUsername());
-        return ResponseEntity.status(HttpStatus.CREATED).body(new AuthResponse(token, user.getUsername()));
+        return ResponseEntity.status(HttpStatus.CREATED).body(new AuthResponse(token, user.getUsername(), user.getSalt()));
     }
 
     @PostMapping("/logout")
@@ -118,5 +120,42 @@ public class AuthController {
         return ResponseEntity.ok(java.util.Map.of(
             "message", "Logged out successfully"
         ));
+    }
+
+    @PostMapping("/refresh_token")
+    public ResponseEntity<?> refreshToken(@RequestBody RefreshTokenRequest request) {
+        try {
+            String token = request.getRefreshToken();
+            String username = jwtUtil.extractUsernameFromExpiredToken(token);
+             Date expiration = jwtUtil.extractExpirationFromExpiredToken(token);
+            
+            // Security: Only allow refresh within 3 days after expiration
+            long daysSinceExpiration = java.time.Duration.between(
+                expiration.toInstant(), 
+                java.time.Instant.now()
+            ).toDays();
+            
+            if (daysSinceExpiration > 3) {
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                    .body("Token expired too long ago. Please login again.");
+            }
+            
+            // Buscar usuário
+            Optional<User> userOptional = userRepository.findByUsername(username);
+            
+            if (userOptional.isEmpty()) {
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("User not found");
+            }
+            
+            User user = userOptional.get();
+            
+            // Gerar novo token
+            String newToken = jwtUtil.generateToken(username);
+            
+            return ResponseEntity.ok(new AuthResponse(newToken, username, user.getSalt()));
+            
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid or corrupted token");
+        }
     }
 }
