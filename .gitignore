@@ -34,3 +34,9 @@ build/
 !.vscode/tasks.json
 !.vscode/launch.json
 !.vscode/extensions.json
+
+### Environment Files ###
+.env
+.env.dev
+.env.prod
+.env.local
