@@ -4,6 +4,7 @@ public class AuthResponse {
     
     private String token;
     private String username;
+    private String salt;
 
     public AuthResponse() {
     }
@@ -11,6 +12,12 @@ public class AuthResponse {
     public AuthResponse(String token, String username) {
         this.token = token;
         this.username = username;
+    }
+
+    public AuthResponse(String token, String username, String salt) {
+        this.token = token;
+        this.username = username;
+        this.salt = salt;
     }
 
     public String getToken() {
@@ -27,5 +34,13 @@ public class AuthResponse {
 
     public void setUsername(String username) {
         this.username = username;
+    }
+
+    public String getSalt() {
+        return salt;
+    }
+
+    public void setSalt(String salt) {
+        this.salt = salt;
     }
 }

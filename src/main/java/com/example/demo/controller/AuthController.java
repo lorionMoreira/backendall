@@ -71,7 +71,7 @@ public class AuthController {
             userRepository.save(user);
             
             String token = jwtUtil.generateToken(authRequest.getUsername());
-            return ResponseEntity.ok(new AuthResponse(token, authRequest.getUsername()));
+            return ResponseEntity.ok(new AuthResponse(token, authRequest.getUsername(), user.getSalt()));
             
         } catch (BadCredentialsException e) {
             // Senha errada: incrementar tentativas
@@ -111,5 +111,12 @@ public class AuthController {
 
         String token = jwtUtil.generateToken(user.getUsername());
         return ResponseEntity.status(HttpStatus.CREATED).body(new AuthResponse(token, user.getUsername()));
+    }
+
+    @PostMapping("/logout")
+    public ResponseEntity<?> logout() {
+        return ResponseEntity.ok(java.util.Map.of(
+            "message", "Logged out successfully"
+        ));
     }
 }

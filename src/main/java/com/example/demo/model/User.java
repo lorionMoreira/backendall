@@ -29,6 +29,9 @@ public class User {
     @Column(name = "lock_time")
     private LocalDateTime lockTime;
 
+    @Column(name = "salt")
+    private String salt;
+
     public User() {
     }
 
@@ -93,5 +96,13 @@ public class User {
 
     public void setLockTime(LocalDateTime lockTime) {
         this.lockTime = lockTime;
+    }
+
+    public String getSalt() {
+        return salt;
+    }
+
+    public void setSalt(String salt) {
+        this.salt = salt;
     }
 }
