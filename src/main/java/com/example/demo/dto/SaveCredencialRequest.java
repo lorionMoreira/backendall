@@ -7,14 +7,16 @@ public class SaveCredencialRequest {
     private UUID uuid;
     private String company;
     private String senha;
+    private Boolean favoritos;
 
     public SaveCredencialRequest() {
     }
 
-    public SaveCredencialRequest(UUID uuid, String company, String senha) {
+    public SaveCredencialRequest(UUID uuid, String company, String senha, Boolean favoritos) {
         this.uuid = uuid;
         this.company = company;
         this.senha = senha;
+        this.favoritos = favoritos;
     }
 
     public UUID getUuid() {
@@ -39,5 +41,13 @@ public class SaveCredencialRequest {
 
     public void setSenha(String senha) {
         this.senha = senha;
+    }
+
+    public Boolean getFavoritos() {
+        return favoritos;
+    }
+
+    public void setFavoritos(Boolean favoritos) {
+        this.favoritos = favoritos;
     }
 }

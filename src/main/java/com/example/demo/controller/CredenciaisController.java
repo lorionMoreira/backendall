@@ -95,6 +95,7 @@ public class CredenciaisController {
             request.getSenha()
         );
         credencial.setUuid(credenciaisService.generateUniqueUuid());
+        credencial.setFavoritos(request.getFavoritos() != null ? request.getFavoritos() : false);
 
         Credenciais savedCredencial = credenciaisService.saveCredencial(credencial);
         CreateCredencialResponse response = credenciaisService.mapToCreateResponse(savedCredencial);
@@ -120,7 +121,8 @@ public class CredenciaisController {
             request.getUuid(),
             userOptional.get().getId(),
             request.getCompany(),
-            request.getSenha()
+            request.getSenha(),
+            request.getFavoritos()
         );
 
         if (updatedCredencial.isEmpty()) {

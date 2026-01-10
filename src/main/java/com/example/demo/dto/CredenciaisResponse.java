@@ -9,17 +9,19 @@ public class CredenciaisResponse {
     private UUID uuid;
     private String company;
     private String senha;
+    private Boolean favoritos;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
 
     public CredenciaisResponse() {
     }
 
-    public CredenciaisResponse(Long id, UUID uuid, String company, String senha, LocalDateTime createdAt, LocalDateTime updatedAt) {
+    public CredenciaisResponse(Long id, UUID uuid, String company, String senha, Boolean favoritos, LocalDateTime createdAt, LocalDateTime updatedAt) {
         this.id = id;
         this.uuid = uuid;
         this.company = company;
         this.senha = senha;
+        this.favoritos = favoritos;
         this.createdAt = createdAt;
         this.updatedAt = updatedAt;
     }
@@ -55,6 +57,14 @@ public class CredenciaisResponse {
 
     public void setSenha(String senha) {
         this.senha = senha;
+    }
+
+    public Boolean getFavoritos() {
+        return favoritos;
+    }
+
+    public void setFavoritos(Boolean favoritos) {
+        this.favoritos = favoritos;
     }
 
     public LocalDateTime getCreatedAt() {

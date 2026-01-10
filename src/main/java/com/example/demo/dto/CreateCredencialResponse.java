@@ -8,16 +8,18 @@ public class CreateCredencialResponse {
     private UUID uuid;
     private String company;
     private String senha;
+    private Boolean favoritos;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
 
     public CreateCredencialResponse() {
     }
 
-    public CreateCredencialResponse(UUID uuid, String company, String senha, LocalDateTime createdAt, LocalDateTime updatedAt) {
+    public CreateCredencialResponse(UUID uuid, String company, String senha, Boolean favoritos, LocalDateTime createdAt, LocalDateTime updatedAt) {
         this.uuid = uuid;
         this.company = company;
         this.senha = senha;
+        this.favoritos = favoritos;
         this.createdAt = createdAt;
         this.updatedAt = updatedAt;
     }
@@ -44,6 +46,14 @@ public class CreateCredencialResponse {
 
     public void setSenha(String senha) {
         this.senha = senha;
+    }
+
+    public Boolean getFavoritos() {
+        return favoritos;
+    }
+
+    public void setFavoritos(Boolean favoritos) {
+        this.favoritos = favoritos;
     }
 
     public LocalDateTime getCreatedAt() {

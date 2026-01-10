@@ -25,6 +25,9 @@ public class Credenciais {
     @Column(nullable = false)
     private String senha;
 
+    @Column(nullable = false)
+    private Boolean favoritos = false;
+
     @Column(name = "created_at", nullable = false, updatable = false)
     private LocalDateTime createdAt;
 
@@ -91,6 +94,14 @@ public class Credenciais {
 
     public void setSenha(String senha) {
         this.senha = senha;
+    }
+
+    public Boolean getFavoritos() {
+        return favoritos;
+    }
+
+    public void setFavoritos(Boolean favoritos) {
+        this.favoritos = favoritos;
     }
 
     public LocalDateTime getCreatedAt() {

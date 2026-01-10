@@ -4,13 +4,15 @@ public class CreateCredencialRequest {
     
     private String company;
     private String senha;
+    private Boolean favoritos;
 
     public CreateCredencialRequest() {
     }
 
-    public CreateCredencialRequest(String company, String senha) {
+    public CreateCredencialRequest(String company, String senha, Boolean favoritos) {
         this.company = company;
         this.senha = senha;
+        this.favoritos = favoritos;
     }
 
     public String getCompany() {
@@ -27,5 +29,13 @@ public class CreateCredencialRequest {
 
     public void setSenha(String senha) {
         this.senha = senha;
+    }
+
+    public Boolean getFavoritos() {
+        return favoritos;
+    }
+
+    public void setFavoritos(Boolean favoritos) {
+        this.favoritos = favoritos;
     }
 }
