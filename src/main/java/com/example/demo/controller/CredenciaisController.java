@@ -3,6 +3,7 @@ package com.example.demo.controller;
 import com.example.demo.dto.CredencialRequest;
 import com.example.demo.dto.CredenciaisResponse;
 import com.example.demo.dto.CreateCredencialRequest;
+import com.example.demo.dto.CreateCredencialResponse;
 import com.example.demo.dto.SaveCredencialRequest;
 import com.example.demo.model.Credenciais;
 import com.example.demo.model.User;
@@ -96,7 +97,7 @@ public class CredenciaisController {
         credencial.setUuid(credenciaisService.generateUniqueUuid());
 
         Credenciais savedCredencial = credenciaisService.saveCredencial(credencial);
-        CredenciaisResponse response = credenciaisService.mapToResponse(savedCredencial);
+        CreateCredencialResponse response = credenciaisService.mapToCreateResponse(savedCredencial);
 
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }

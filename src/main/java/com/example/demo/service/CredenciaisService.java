@@ -1,6 +1,7 @@
 package com.example.demo.service;
 
 import com.example.demo.dto.CredenciaisResponse;
+import com.example.demo.dto.CreateCredencialResponse;
 import com.example.demo.model.Credenciais;
 import com.example.demo.model.User;
 import com.example.demo.repository.CredenciaisRepository;
@@ -72,6 +73,16 @@ public class CredenciaisService {
     public CredenciaisResponse mapToResponse(Credenciais credencial) {
         return new CredenciaisResponse(
             credencial.getId(),
+            credencial.getUuid(),
+            credencial.getCompany(),
+            credencial.getSenha(),
+            credencial.getCreatedAt(),
+            credencial.getUpdatedAt()
+        );
+    }
+
+    public CreateCredencialResponse mapToCreateResponse(Credenciais credencial) {
+        return new CreateCredencialResponse(
             credencial.getUuid(),
             credencial.getCompany(),
             credencial.getSenha(),
