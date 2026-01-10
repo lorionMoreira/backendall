@@ -38,6 +38,31 @@ public class CredenciaisService {
         return credenciaisRepository.findByUuidAndUserId(uuid, userId);
     }
 
+    public UUID generateUniqueUuid() {
+        UUID uuid;
+        do {
+            uuid = UUID.randomUUID();
+        } while (credenciaisRepository.existsByUuid(uuid));
+        return uuid;
+    }
+
+    public Credenciais saveCredencial(Credenciais credencial) {
+        return credenciaisRepository.save(credencial);
+    }
+
+    public Optional<Credenciais> updateCredencial(UUID uuid, Long userId, String company, String senha) {
+        Optional<Credenciais> credencialOptional = credenciaisRepository.findByUuidAndUserId(uuid, userId);
+        
+        if (credencialOptional.isPresent()) {
+            Credenciais credencial = credencialOptional.get();
+            credencial.setCompany(company);
+            credencial.setSenha(senha);
+            return Optional.of(credenciaisRepository.save(credencial));
+        }
+        
+        return Optional.empty();
+    }
+
     public List<CredenciaisResponse> mapToResponseList(List<Credenciais> credenciais) {
         return credenciais.stream()
                 .map(this::mapToResponse)

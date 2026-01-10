@@ -2,6 +2,8 @@ package com.example.demo.controller;
 
 import com.example.demo.dto.CredencialRequest;
 import com.example.demo.dto.CredenciaisResponse;
+import com.example.demo.dto.CreateCredencialRequest;
+import com.example.demo.dto.SaveCredencialRequest;
 import com.example.demo.model.Credenciais;
 import com.example.demo.model.User;
 import com.example.demo.service.CredenciaisService;
@@ -17,6 +19,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 @RestController
@@ -68,6 +71,62 @@ public class CredenciaisController {
         }
 
         CredenciaisResponse response = credenciaisService.mapToResponse(credencialOptional.get());
+        return ResponseEntity.ok(response);
+    }
+
+    @PostMapping
+    @Operation(summary = "Create a new credential",
+               description = "Creates a new credential for the authenticated user",
+               security = @SecurityRequirement(name = "bearerAuth"))
+    public ResponseEntity<?> createCredential(@RequestBody CreateCredencialRequest request) {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String username = authentication.getName();
+
+        Optional<User> userOptional = credenciaisService.getUserByUsername(username);
+        
+        if (userOptional.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("User not found");
+        }
+
+        Credenciais credencial = new Credenciais(
+            userOptional.get(),
+            request.getCompany(),
+            request.getSenha()
+        );
+        credencial.setUuid(credenciaisService.generateUniqueUuid());
+
+        Credenciais savedCredencial = credenciaisService.saveCredencial(credencial);
+        CredenciaisResponse response = credenciaisService.mapToResponse(savedCredencial);
+
+        return ResponseEntity.status(HttpStatus.CREATED).body(response);
+    }
+
+    @PostMapping("/update")
+    @Operation(summary = "Update an existing credential",
+               description = "Updates an existing credential for the authenticated user",
+               security = @SecurityRequirement(name = "bearerAuth"))
+    public ResponseEntity<?> updateCredential(@RequestBody SaveCredencialRequest request) {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String username = authentication.getName();
+
+        Optional<User> userOptional = credenciaisService.getUserByUsername(username);
+        
+        if (userOptional.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("User not found");
+        }
+
+        Optional<Credenciais> updatedCredencial = credenciaisService.updateCredencial(
+            request.getUuid(),
+            userOptional.get().getId(),
+            request.getCompany(),
+            request.getSenha()
+        );
+
+        if (updatedCredencial.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Credential not found");
+        }
+
+        CredenciaisResponse response = credenciaisService.mapToResponse(updatedCredencial.get());
         return ResponseEntity.ok(response);
     }
 }

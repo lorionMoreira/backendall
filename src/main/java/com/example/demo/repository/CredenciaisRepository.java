@@ -16,4 +16,6 @@ public interface CredenciaisRepository extends JpaRepository<Credenciais, Long> 
     Optional<Credenciais> findByIdAndUserId(Long id, Long userId);
     
     Optional<Credenciais> findByUuidAndUserId(UUID uuid, Long userId);
+    
+    boolean existsByUuid(UUID uuid);
 }
