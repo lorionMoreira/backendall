@@ -28,6 +28,12 @@ public class Credenciais {
     @Column(nullable = false)
     private Boolean favoritos = false;
 
+    @Column(name = "iv_1")
+    private String iv1;
+
+    @Column(name = "iv_2")
+    private String iv2;
+
     @Column(name = "created_at", nullable = false, updatable = false)
     private LocalDateTime createdAt;
 
@@ -102,6 +108,22 @@ public class Credenciais {
 
     public void setFavoritos(Boolean favoritos) {
         this.favoritos = favoritos;
+    }
+
+    public String getIv1() {
+        return iv1;
+    }
+
+    public void setIv1(String iv1) {
+        this.iv1 = iv1;
+    }
+
+    public String getIv2() {
+        return iv2;
+    }
+
+    public void setIv2(String iv2) {
+        this.iv2 = iv2;
     }
 
     public LocalDateTime getCreatedAt() {

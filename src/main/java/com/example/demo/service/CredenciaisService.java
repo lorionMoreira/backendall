@@ -7,6 +7,8 @@ import com.example.demo.model.User;
 import com.example.demo.repository.CredenciaisRepository;
 import com.example.demo.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -31,6 +33,10 @@ public class CredenciaisService {
         return credenciaisRepository.findByUserId(userId);
     }
 
+    public Page<Credenciais> getAllCredenciaisByUserId(Long userId, Pageable pageable) {
+        return credenciaisRepository.findByUserId(userId, pageable);
+    }
+
     public Optional<Credenciais> getCredencialByIdAndUserId(Long id, Long userId) {
         return credenciaisRepository.findByIdAndUserId(id, userId);
     }
@@ -51,7 +57,7 @@ public class CredenciaisService {
         return credenciaisRepository.save(credencial);
     }
 
-    public Optional<Credenciais> updateCredencial(UUID uuid, Long userId, String company, String senha, Boolean favoritos) {
+    public Optional<Credenciais> updateCredencial(UUID uuid, Long userId, String company, String senha, Boolean favoritos, String iv1, String iv2) {
         Optional<Credenciais> credencialOptional = credenciaisRepository.findByUuidAndUserId(uuid, userId);
         
         if (credencialOptional.isPresent()) {
@@ -59,10 +65,23 @@ public class CredenciaisService {
             credencial.setCompany(company);
             credencial.setSenha(senha);
             credencial.setFavoritos(favoritos);
+            credencial.setIv1(iv1);
+            credencial.setIv2(iv2);
             return Optional.of(credenciaisRepository.save(credencial));
         }
         
         return Optional.empty();
+    }
+
+    public boolean deleteCredencial(UUID uuid, Long userId) {
+        Optional<Credenciais> credencialOptional = credenciaisRepository.findByUuidAndUserId(uuid, userId);
+        
+        if (credencialOptional.isPresent()) {
+            credenciaisRepository.delete(credencialOptional.get());
+            return true;
+        }
+        
+        return false;
     }
 
     public List<CredenciaisResponse> mapToResponseList(List<Credenciais> credenciais) {
@@ -78,6 +97,8 @@ public class CredenciaisService {
             credencial.getCompany(),
             credencial.getSenha(),
             credencial.getFavoritos(),
+            credencial.getIv1(),
+            credencial.getIv2(),
             credencial.getCreatedAt(),
             credencial.getUpdatedAt()
         );
@@ -89,6 +110,8 @@ public class CredenciaisService {
             credencial.getCompany(),
             credencial.getSenha(),
             credencial.getFavoritos(),
+            credencial.getIv1(),
+            credencial.getIv2(),
             credencial.getCreatedAt(),
             credencial.getUpdatedAt()
         );

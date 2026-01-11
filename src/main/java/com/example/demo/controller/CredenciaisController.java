@@ -12,6 +12,10 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
@@ -19,6 +23,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -33,9 +38,13 @@ public class CredenciaisController {
 
     @GetMapping
     @Operation(summary = "Get all credentials for authenticated user",
-               description = "Returns all credentials associated with the current authenticated user",
+               description = "Returns all credentials associated with the current authenticated user with pagination",
                security = @SecurityRequirement(name = "bearerAuth"))
-    public ResponseEntity<?> getAllCredentials() {
+    public ResponseEntity<?> getAllCredentials(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size,
+            @RequestParam(defaultValue = "createdAt") String sortBy,
+            @RequestParam(defaultValue = "DESC") String sortDirection) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         String username = authentication.getName();
 
@@ -45,10 +54,21 @@ public class CredenciaisController {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("User not found");
         }
 
-        List<Credenciais> credenciais = credenciaisService.getAllCredenciaisByUserId(userOptional.get().getId());
-        List<CredenciaisResponse> response = credenciaisService.mapToResponseList(credenciais);
+        Sort.Direction direction = sortDirection.equalsIgnoreCase("ASC") ? Sort.Direction.ASC : Sort.Direction.DESC;
+        Pageable pageable = PageRequest.of(page, size, Sort.by(direction, sortBy));
+        
+        Page<Credenciais> credenciaisPage = credenciaisService.getAllCredenciaisByUserId(userOptional.get().getId(), pageable);
+        Page<CreateCredencialResponse> responsePage = credenciaisPage.map(credenciaisService::mapToCreateResponse);
 
-        return ResponseEntity.ok(response);
+        return ResponseEntity.ok(Map.of(
+            "content", responsePage.getContent(),
+            "currentPage", responsePage.getNumber(),
+            "totalItems", responsePage.getTotalElements(),
+            "totalPages", responsePage.getTotalPages(),
+            "pageSize", responsePage.getSize(),
+            "hasNext", responsePage.hasNext(),
+            "hasPrevious", responsePage.hasPrevious()
+        ));
     }
 
     @PostMapping("/get")
@@ -96,6 +116,8 @@ public class CredenciaisController {
         );
         credencial.setUuid(credenciaisService.generateUniqueUuid());
         credencial.setFavoritos(request.getFavoritos() != null ? request.getFavoritos() : false);
+        credencial.setIv1(request.getIv1());
+        credencial.setIv2(request.getIv2());
 
         Credenciais savedCredencial = credenciaisService.saveCredencial(credencial);
         CreateCredencialResponse response = credenciaisService.mapToCreateResponse(savedCredencial);
@@ -122,14 +144,39 @@ public class CredenciaisController {
             userOptional.get().getId(),
             request.getCompany(),
             request.getSenha(),
-            request.getFavoritos()
+            request.getFavoritos(),
+            request.getIv1(),
+            request.getIv2()
         );
 
         if (updatedCredencial.isEmpty()) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Credential not found");
         }
 
-        CredenciaisResponse response = credenciaisService.mapToResponse(updatedCredencial.get());
+        CreateCredencialResponse response = credenciaisService.mapToCreateResponse(updatedCredencial.get());
         return ResponseEntity.ok(response);
+    }
+
+    @PostMapping("/minus")
+    @Operation(summary = "Delete a credential",
+               description = "Deletes a credential by UUID for the authenticated user",
+               security = @SecurityRequirement(name = "bearerAuth"))
+    public ResponseEntity<?> deleteCredential(@RequestBody CredencialRequest request) {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String username = authentication.getName();
+
+        Optional<User> userOptional = credenciaisService.getUserByUsername(username);
+        
+        if (userOptional.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("User not found");
+        }
+
+        boolean deleted = credenciaisService.deleteCredencial(request.getUuid(), userOptional.get().getId());
+
+        if (!deleted) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Credential not found");
+        }
+
+        return ResponseEntity.ok().body(Map.of("message", "Credential deleted successfully"));
     }
 }
