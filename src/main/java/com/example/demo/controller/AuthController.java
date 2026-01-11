@@ -8,6 +8,7 @@ import com.example.demo.model.User;
 import com.example.demo.repository.UserRepository;
 import com.example.demo.security.JwtUtil;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -36,6 +37,9 @@ public class AuthController {
 
     @Autowired
     private PasswordEncoder passwordEncoder;
+
+    @Value("${app.registration.enabled:true}")
+    private boolean registrationEnabled;
 
     @PostMapping("/login")
     public ResponseEntity<?> login(@RequestBody AuthRequest authRequest) {
@@ -95,6 +99,10 @@ public class AuthController {
 
     @PostMapping("/register")
     public ResponseEntity<?> register(@RequestBody RegisterRequest registerRequest) {
+        if (!registrationEnabled) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Registration is currently disabled");
+        }
+
         if (userRepository.existsByUsername(registerRequest.getUsername())) {
             return ResponseEntity.badRequest().body("Username already exists");
         }
@@ -107,6 +115,7 @@ public class AuthController {
         user.setUsername(registerRequest.getUsername());
         user.setPassword(passwordEncoder.encode(registerRequest.getPassword()));
         user.setEmail(registerRequest.getEmail());
+        user.setSalt(registerRequest.getSalt());
         user.setRole("USER");
         
         userRepository.save(user);
