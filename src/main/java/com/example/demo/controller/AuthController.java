@@ -21,6 +21,7 @@ import org.springframework.web.bind.annotation.*;
 import java.time.LocalDateTime;
 import java.util.Date;
 import java.util.Optional;
+import java.security.SecureRandom;
 
 @RestController
 @RequestMapping("/api/auth")
@@ -99,6 +100,8 @@ public class AuthController {
 
     @PostMapping("/register")
     public ResponseEntity<?> register(@RequestBody RegisterRequest registerRequest) {
+        
+        // 1. Validações iniciais
         if (!registrationEnabled) {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Registration is currently disabled");
         }
@@ -111,17 +114,38 @@ public class AuthController {
             return ResponseEntity.badRequest().body("Email already exists");
         }
 
+        // 2. GERAÇÃO DO SALT NO SERVIDOR (Temporário)
+        // Gera 16 bytes aleatórios e converte para String Hexadecimal
+        String generatedSalt = generateHexSalt(); 
+
         User user = new User();
         user.setUsername(registerRequest.getUsername());
+        
         user.setPassword(passwordEncoder.encode(registerRequest.getPassword()));
+        
         user.setEmail(registerRequest.getEmail());
-        user.setSalt(registerRequest.getSalt());
+        user.setSalt(generatedSalt); // Define o salt gerado aqui
         user.setRole("USER");
         
         userRepository.save(user);
 
         String token = jwtUtil.generateToken(user.getUsername());
-        return ResponseEntity.status(HttpStatus.CREATED).body(new AuthResponse(token, user.getUsername(), user.getSalt()));
+        
+        return ResponseEntity.status(HttpStatus.CREATED)
+            .body(new AuthResponse(token, user.getUsername(), generatedSalt));
+    }
+
+    // --- Função Auxiliar para gerar o Salt Hexadecimal ---
+    private String generateHexSalt() {
+        SecureRandom random = new SecureRandom();
+        byte[] salt = new byte[16];
+        random.nextBytes(salt);
+        
+        StringBuilder sb = new StringBuilder();
+        for (byte b : salt) {
+            sb.append(String.format("%02x", b));
+        }
+        return sb.toString();
     }
 
     @PostMapping("/logout")
