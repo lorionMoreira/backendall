@@ -11,19 +11,23 @@ public class CreateCredencialResponse {
     private Boolean favoritos;
     private String iv1;
     private String iv2;
+    private String iv3;
+    private String email;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
 
     public CreateCredencialResponse() {
     }
 
-    public CreateCredencialResponse(UUID uuid, String company, String senha, Boolean favoritos, String iv1, String iv2, LocalDateTime createdAt, LocalDateTime updatedAt) {
+    public CreateCredencialResponse(UUID uuid, String company, String senha, Boolean favoritos, String iv1, String iv2, String iv3, String email, LocalDateTime createdAt, LocalDateTime updatedAt) {
         this.uuid = uuid;
         this.company = company;
         this.senha = senha;
         this.favoritos = favoritos;
         this.iv1 = iv1;
         this.iv2 = iv2;
+        this.iv3 = iv3;
+        this.email = email;
         this.createdAt = createdAt;
         this.updatedAt = updatedAt;
     }
@@ -74,6 +78,22 @@ public class CreateCredencialResponse {
 
     public void setIv2(String iv2) {
         this.iv2 = iv2;
+    }
+
+    public String getIv3() {
+        return iv3;
+    }
+
+    public void setIv3(String iv3) {
+        this.iv3 = iv3;
+    }
+
+    public String getEmail() {
+        return email;
+    }
+
+    public void setEmail(String email) {
+        this.email = email;
     }
 
     public LocalDateTime getCreatedAt() {

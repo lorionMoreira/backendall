@@ -42,7 +42,7 @@ public class AuthController {
     @Value("${app.registration.enabled:true}")
     private boolean registrationEnabled;
 
-    @PostMapping("/login")
+    @PostMapping("/entry")
     public ResponseEntity<?> login(@RequestBody AuthRequest authRequest) {
         // Buscar usuário
         Optional<User> userOptional = userRepository.findByUsername(authRequest.getUsername());

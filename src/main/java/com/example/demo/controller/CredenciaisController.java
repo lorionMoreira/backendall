@@ -118,6 +118,8 @@ public class CredenciaisController {
         credencial.setFavoritos(request.getFavoritos() != null ? request.getFavoritos() : false);
         credencial.setIv1(request.getIv1());
         credencial.setIv2(request.getIv2());
+        credencial.setIv3(request.getIv3());
+        credencial.setEmail(request.getEmail());
 
         Credenciais savedCredencial = credenciaisService.saveCredencial(credencial);
         CreateCredencialResponse response = credenciaisService.mapToCreateResponse(savedCredencial);
@@ -146,7 +148,9 @@ public class CredenciaisController {
             request.getSenha(),
             request.getFavoritos(),
             request.getIv1(),
-            request.getIv2()
+            request.getIv2(),
+            request.getIv3(),
+            request.getEmail()
         );
 
         if (updatedCredencial.isEmpty()) {

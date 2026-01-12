@@ -57,7 +57,7 @@ public class CredenciaisService {
         return credenciaisRepository.save(credencial);
     }
 
-    public Optional<Credenciais> updateCredencial(UUID uuid, Long userId, String company, String senha, Boolean favoritos, String iv1, String iv2) {
+    public Optional<Credenciais> updateCredencial(UUID uuid, Long userId, String company, String senha, Boolean favoritos, String iv1, String iv2, String iv3, String email) {
         Optional<Credenciais> credencialOptional = credenciaisRepository.findByUuidAndUserId(uuid, userId);
         
         if (credencialOptional.isPresent()) {
@@ -67,6 +67,8 @@ public class CredenciaisService {
             credencial.setFavoritos(favoritos);
             credencial.setIv1(iv1);
             credencial.setIv2(iv2);
+            credencial.setIv3(iv3);
+            credencial.setEmail(email);
             return Optional.of(credenciaisRepository.save(credencial));
         }
         
@@ -99,6 +101,8 @@ public class CredenciaisService {
             credencial.getFavoritos(),
             credencial.getIv1(),
             credencial.getIv2(),
+            credencial.getIv3(),
+            credencial.getEmail(),
             credencial.getCreatedAt(),
             credencial.getUpdatedAt()
         );
@@ -112,6 +116,8 @@ public class CredenciaisService {
             credencial.getFavoritos(),
             credencial.getIv1(),
             credencial.getIv2(),
+            credencial.getIv3(),
+            credencial.getEmail(),
             credencial.getCreatedAt(),
             credencial.getUpdatedAt()
         );

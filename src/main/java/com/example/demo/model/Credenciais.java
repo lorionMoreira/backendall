@@ -34,6 +34,12 @@ public class Credenciais {
     @Column(name = "iv_2")
     private String iv2;
 
+    @Column(name = "iv_3")
+    private String iv3;
+
+    @Column
+    private String email;
+
     @Column(name = "created_at", nullable = false, updatable = false)
     private LocalDateTime createdAt;
 
@@ -124,6 +130,22 @@ public class Credenciais {
 
     public void setIv2(String iv2) {
         this.iv2 = iv2;
+    }
+
+    public String getIv3() {
+        return iv3;
+    }
+
+    public void setIv3(String iv3) {
+        this.iv3 = iv3;
+    }
+
+    public String getEmail() {
+        return email;
+    }
+
+    public void setEmail(String email) {
+        this.email = email;
     }
 
     public LocalDateTime getCreatedAt() {
