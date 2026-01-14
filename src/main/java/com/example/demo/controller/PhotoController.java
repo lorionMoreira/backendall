@@ -23,6 +23,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
+import org.springframework.data.web.PagedModel;
 
 import com.example.demo.dto.PhotoResponseDTO;
 import com.example.demo.model.Photo;
@@ -65,7 +66,7 @@ public class PhotoController {
     @Operation(summary = "Get all photos for authenticated user",
                description = "Returns all photos for the current authenticated user with pagination",
                security = @SecurityRequirement(name = "bearerAuth"))
-    public ResponseEntity<Page<PhotoResponseDTO>> getAllPhotos(Pageable pageable) {
+    public ResponseEntity<PagedModel<PhotoResponseDTO>> getAllPhotos(Pageable pageable){
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         String username = authentication.getName();
         
@@ -75,15 +76,16 @@ public class PhotoController {
         Page<Photo> photos = photoService.getAllPhotos(user.getId(), pageable);
 
         Page<PhotoResponseDTO> dtoPage = photos.map(photo -> {
-            String downloadUrl = ServletUriComponentsBuilder.fromCurrentContextPath()
-                    .path("/api/photos/download/")
-                    .path(photo.getUuid().toString())
+            String downloadUrl = ServletUriComponentsBuilder.fromCurrentRequest()
+                    .replacePath("/api/photos/download/" + photo.getUuid().toString())
+                    .replaceQuery(null)
+                    .scheme("https")
                     .toUriString();
             
             return new PhotoResponseDTO(photo.getUuid(), photo.getOriginalFileName(), downloadUrl);
         });
 
-        return ResponseEntity.ok(dtoPage);
+        return ResponseEntity.ok(new PagedModel<>(dtoPage));
     }
 
     @GetMapping("/download/{uuid}")
